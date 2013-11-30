@@ -1,0 +1,125 @@
+#-*-coding:utf8-*-
+import math,time
+
+#mail:iniwaper@gamil.com
+#autor:iniwap
+
+
+#26*13
+start=time.clock()
+Map=[
+'##########################',
+'#++++++++++++++++++++++++#',
+'#+s++++++++++++++++++++++#',
+'#+++++++++++###++++++++++#',
+'#++++++++++++++++++++++++#',
+'######+####+++++#####++++#', 
+'#++++++++++++##++++++++#+#',
+'#+++++#++++++#+++++++++++#',
+'#++++#+##++++###++#####++#',
+'#+++++++++++++++++#e+++++#',
+'#+++++++++++++++++#+###++#',
+'#++++++++++++++++++++++++#',
+'##########################']
+def get_SE(map,point):
+   for y in range(len(map)):
+       for x in range(len(map[0])):
+           if map[y][x]==point:
+               return (x,y)
+def get_fx(node):
+    return math.sqrt(math.pow((node[0][0]-E[0][0]),2)+math.pow((node[0][1]-E[0][1]),2))+node[1]
+def get_best(open):
+    best_fx=[]
+    for node in open:
+        best_fx.append(get_fx(node))
+    best_node=open[best_fx.index(min(best_fx))]
+    return best_node
+def expand(node):
+    global p
+    snode=[]
+    if Map[node[0][1]][node[0][0]+1]!='#':
+        p+=1
+        nodeR=[(node[0][0]+1,node[0][1]),node[1]+1,p,node[2]]
+        snode.append(nodeR)
+    if Map[node[0][1]+1][node[0][0]+1]!='#':
+        p+=1
+        nodeRD=[(node[0][0]+1,node[0][1]+1),node[1]+1.4,p,node[2]]
+        snode.append(nodeRD)
+    if Map[node[0][1]+1][node[0][0]]!='#':
+        p+=1
+        nodeD=[(node[0][0],node[0][1]+1),node[1]+1,p,node[2]]
+        snode.append(nodeD)
+    if Map[node[0][1]+1][node[0][0]-1]!='#':
+        p+=1
+        nodeLD=[(node[0][0]-1,node[0][1]+1),node[1]+1.4,p,node[2]]
+        snode.append(nodeLD)
+    if Map[node[0][1]][node[0][0]-1]!='#':
+        p+=1
+        nodeL=[(node[0][0]-1,node[0][1]),node[1]+1,p,node[2]]
+        snode.append(nodeL)
+    if Map[node[0][1]-1][node[0][0]-1]!='#':
+        p+=1
+        nodeLU=[(node[0][0]-1,node[0][1]-1),node[1]+1.4,p,node[2]]
+        snode.append(nodeLU)
+    if Map[node[0][1]-1][node[0][0]]!='#':
+        p+=1
+        nodeU=[(node[0][0],node[0][1]-1),node[1]+1,p,node[2]]
+        snode.append(nodeU)
+    if Map[node[0][1]-1][node[0][0]+1]!='#':
+        p+=1
+        nodeRU=[(node[0][0]+1,node[0][1]-1),node[1]+1.4,p,node[2]]
+        snode.append(nodeRU)
+    return snode
+def AStar(map):
+    global E,p
+    p=0
+    S=[]
+    E=[]
+    S.append(get_SE(map,'s'))
+    E.append(get_SE(map,'e'))
+    S.append(0)
+    S.append(0)
+    S.append(0)
+    OPEN=[]
+    CLOSED=[]
+    OPEN.append(S)
+    while len(OPEN)!=0:
+        best_node=get_best(OPEN)
+        search=[i[0]for i in CLOSED]
+        if best_node[0]==E[0]:
+            path=[]
+            parent=best_node[3]
+            while len(CLOSED)!=1:
+                temp=CLOSED.pop()
+                if temp[2]==parent:
+                    path.append(temp[0])
+                    parent=temp[3]
+            print 'The total steps are:',len(path)
+            for y in range(len(map)):
+                map[y]=list(map[y])
+                for x in range(len(map[0])):
+                    if (x,y) in search:
+                        map[y][x]='_'
+                    if (x,y) in path:
+                        map[y][x]='*'
+            for i in range(len(map)):
+                print(''.join(map[i])+'\t')         
+            break
+        CLOSED.append(best_node)
+        del(OPEN[OPEN.index(best_node)])
+        for successor in expand(best_node):
+            if successor[0] in [i[0]for i in CLOSED]:
+                continue
+            if successor[0] not in [i[0]for i in OPEN]:
+                OPEN.append(successor)
+            else:
+                old=[i[0]for i in OPEN]
+                old_node=OPEN[old.index(successor[0])]
+                if get_fx(successor)<get_fx(old_node):
+                    old_node[1]=successor[1]
+                    old_node[3]=successor[3]
+    if len(OPEN)==0:
+        print('No path')
+AStar(Map)
+end=time.clock()
+print(end-start)
